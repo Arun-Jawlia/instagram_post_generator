@@ -1,0 +1,262 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@layer base {
+  :root {
+    /* @conceptstocode Dark Theme (Primary) */
+    --background: 222 47% 5%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 47% 7%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 7%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 199 89% 60%;
+    --primary-foreground: 222 47% 5%;
+
+    --secondary: 222 47% 12%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 215 16% 47%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 270 67% 76%;
+    --accent-foreground: 222 47% 5%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 222 47% 15%;
+    --input: 222 47% 15%;
+    --ring: 199 89% 60%;
+
+    --radius: 0.5rem;
+
+    /* @conceptstocode Brand Colors */
+    --brand-primary: #38bdf8;
+    --brand-secondary: #22c55e;
+    --brand-accent: #a78bfa;
+    --brand-text: #e5e7eb;
+    --brand-muted: #94a3b8;
+    --brand-border: #1e293b;
+    --brand-bg-dark: #0b1120;
+    --brand-bg-gradient-from: #0f172a;
+    --brand-bg-gradient-to: #020617;
+
+    /* Custom design tokens */
+    --gradient-primary: linear-gradient(135deg, hsl(199 89% 60%) 0%, hsl(270 67% 76%) 100%);
+    --gradient-surface: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+    --gradient-glow: radial-gradient(circle at 50% 0%, hsl(199 89% 60% / 0.15) 0%, transparent 50%);
+    
+    --shadow-glow: 0 0 40px hsl(199 89% 60% / 0.2);
+    --shadow-card: 0 4px 24px hsl(0 0% 0% / 0.4);
+    
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-sans: 'Inter', system-ui, sans-serif;
+
+    --sidebar-background: 222 47% 5%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 199 89% 60%;
+    --sidebar-primary-foreground: 222 47% 5%;
+    --sidebar-accent: 222 47% 12%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 222 47% 15%;
+    --sidebar-ring: 199 89% 60%;
+  }
+
+  /* @conceptstocode Light Theme */
+  .light {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 215 16% 47%;
+    --muted-foreground: 215 25% 40%;
+
+    --accent: 263 70% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
+
+    /* Light mode brand colors */
+    --brand-primary: #2563eb;
+    --brand-secondary: #16a34a;
+    --brand-accent: #7c3aed;
+    --brand-text: #0f172a;
+    --brand-muted: #64748b;
+    --brand-border: #e2e8f0;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: var(--font-sans);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+
+  code, pre {
+    font-family: var(--font-mono);
+  }
+}
+
+@layer components {
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-primary);
+  }
+
+  .gradient-border {
+    position: relative;
+  }
+
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: var(--gradient-primary);
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .glow-effect {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .card-elevated {
+    @apply bg-card rounded-xl;
+    box-shadow: var(--shadow-card);
+  }
+
+  .toolbar-button {
+    @apply flex items-center justify-center p-2 rounded-lg transition-all duration-200;
+    @apply hover:bg-secondary text-muted-foreground hover:text-foreground;
+  }
+
+  .toolbar-button-active {
+    @apply bg-primary/20 text-primary;
+  }
+
+  .canvas-container {
+    @apply rounded-xl overflow-hidden;
+    box-shadow: 0 0 0 1px hsl(var(--border)), var(--shadow-card);
+  }
+
+  .slide-thumbnail {
+    @apply rounded-lg overflow-hidden cursor-pointer transition-all duration-200;
+    @apply border-2 border-transparent hover:border-primary/50;
+  }
+
+  .slide-thumbnail-active {
+    @apply border-primary shadow-lg;
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+  }
+
+  .panel-section {
+    @apply p-4 border-b border-border;
+  }
+
+  .panel-title {
+    @apply text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3;
+  }
+
+  .input-field {
+    @apply bg-secondary border-0 text-foreground placeholder:text-muted-foreground;
+    @apply focus:ring-2 focus:ring-primary/50 transition-all duration-200;
+  }
+
+  .color-swatch {
+    @apply w-8 h-8 rounded-lg cursor-pointer transition-transform duration-200;
+    @apply hover:scale-110 ring-2 ring-transparent hover:ring-primary/50;
+  }
+
+  .action-button {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium;
+    @apply transition-all duration-200;
+  }
+
+  .action-button-primary {
+    @apply bg-primary text-primary-foreground hover:opacity-90;
+    @apply shadow-lg;
+    box-shadow: 0 4px 14px hsl(var(--primary) / 0.4);
+  }
+
+  .action-button-secondary {
+    @apply bg-secondary text-foreground hover:bg-secondary/80;
+  }
+
+  /* Canvas size presets */
+  .canvas-size-button {
+    @apply px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200;
+    @apply border border-border hover:border-primary/50 hover:bg-secondary;
+  }
+
+  .canvas-size-button-active {
+    @apply border-primary bg-primary/10 text-primary;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+}

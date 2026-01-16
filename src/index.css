@@ -1,12 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @layer base {
   :root {
-    /* @conceptstocode Dark Theme (Primary) */
+    /* Dark Theme (Primary) */
     --background: 222 47% 5%;
     --foreground: 210 40% 98%;
 
@@ -40,7 +41,7 @@
 
     --radius: 0.5rem;
 
-    /* @conceptstocode Brand Colors */
+    /* Brand Colors */
     --brand-primary: #38bdf8;
     --brand-secondary: #22c55e;
     --brand-accent: #a78bfa;
@@ -72,7 +73,7 @@
     --sidebar-ring: 199 89% 60%;
   }
 
-  /* @conceptstocode Light Theme */
+  /* Light Theme */
   .light {
     --background: 210 40% 98%;
     --foreground: 222 47% 11%;

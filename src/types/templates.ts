@@ -57,7 +57,7 @@ export const templates: Template[] = [
             y: LAYOUT.SAFE_PADDING + LAYOUT.HEADER_HEIGHT / 2,
             width: contentWidth,
             height: 40,
-            content: '@conceptstocode',
+            content: '@yourusename',
             style: {
               fontSize: TYPOGRAPHY.username[mode].fontSize,
               fontWeight: TYPOGRAPHY.username[mode].fontWeight,
@@ -107,7 +107,7 @@ export const templates: Template[] = [
             y: canvasHeight - LAYOUT.SAFE_PADDING - LAYOUT.FOOTER_HEIGHT / 2,
             width: contentWidth,
             height: LAYOUT.FOOTER_HEIGHT,
-            content: 'Swipe 👉 | Follow @conceptstocode',
+            content: 'Swipe 👉 | Follow @yourusename',
             style: {
               fontSize: TYPOGRAPHY.footer[mode].fontSize,
               fontWeight: TYPOGRAPHY.footer[mode].fontWeight,
@@ -140,7 +140,7 @@ export const templates: Template[] = [
             y: LAYOUT.SAFE_PADDING + LAYOUT.HEADER_HEIGHT / 2,
             width: contentWidth,
             height: 40,
-            content: '@conceptstocode',
+            content: '@yourusername',
             style: {
               fontSize: TYPOGRAPHY.username[mode].fontSize,
               fontWeight: TYPOGRAPHY.username[mode].fontWeight,
@@ -189,7 +189,7 @@ export const templates: Template[] = [
             y: canvasHeight - LAYOUT.SAFE_PADDING - LAYOUT.FOOTER_HEIGHT / 2,
             width: contentWidth,
             height: LAYOUT.FOOTER_HEIGHT,
-            content: 'Save this 💾 | Follow @conceptstocode',
+            content: 'Save this 💾 | Follow @yourusername',
             style: {
               fontSize: TYPOGRAPHY.footer[mode].fontSize,
               fontWeight: TYPOGRAPHY.footer[mode].fontWeight,
@@ -222,7 +222,7 @@ export const templates: Template[] = [
             y: LAYOUT.SAFE_PADDING + LAYOUT.HEADER_HEIGHT / 2,
             width: contentWidth,
             height: 40,
-            content: '@conceptstocode',
+            content: '@yourusername',
             style: {
               fontSize: TYPOGRAPHY.username[mode].fontSize,
               fontWeight: TYPOGRAPHY.username[mode].fontWeight,
@@ -271,7 +271,7 @@ export const templates: Template[] = [
             y: canvasHeight - LAYOUT.SAFE_PADDING - LAYOUT.FOOTER_HEIGHT / 2,
             width: contentWidth,
             height: LAYOUT.FOOTER_HEIGHT,
-            content: 'Follow @conceptstocode',
+            content: 'Follow @yourusername',
             style: {
               fontSize: TYPOGRAPHY.footer[mode].fontSize,
               fontWeight: TYPOGRAPHY.footer[mode].fontWeight,
@@ -304,7 +304,7 @@ export const templates: Template[] = [
             y: LAYOUT.SAFE_PADDING + LAYOUT.HEADER_HEIGHT / 2,
             width: contentWidth,
             height: 40,
-            content: '@conceptstocode',
+            content: '@yourusername',
             style: {
               fontSize: TYPOGRAPHY.username[mode].fontSize,
               fontWeight: TYPOGRAPHY.username[mode].fontWeight,
@@ -353,7 +353,7 @@ export const templates: Template[] = [
             y: canvasHeight - LAYOUT.SAFE_PADDING - LAYOUT.FOOTER_HEIGHT / 2,
             width: contentWidth,
             height: LAYOUT.FOOTER_HEIGHT,
-            content: 'Save this 💾 | Follow @conceptstocode',
+            content: 'Save this 💾 | Follow @yourusername',
             style: {
               fontSize: TYPOGRAPHY.footer[mode].fontSize,
               fontWeight: TYPOGRAPHY.footer[mode].fontWeight,
@@ -386,7 +386,7 @@ export const templates: Template[] = [
             y: LAYOUT.SAFE_PADDING + LAYOUT.HEADER_HEIGHT / 2,
             width: contentWidth,
             height: 40,
-            content: '@conceptstocode',
+            content: '@yourusername',
             style: {
               fontSize: TYPOGRAPHY.username[mode].fontSize,
               fontWeight: TYPOGRAPHY.username[mode].fontWeight,
@@ -435,7 +435,7 @@ export const templates: Template[] = [
             y: canvasHeight - LAYOUT.SAFE_PADDING - LAYOUT.FOOTER_HEIGHT / 2,
             width: contentWidth,
             height: LAYOUT.FOOTER_HEIGHT,
-            content: 'Follow @conceptstocode 🚀',
+            content: 'Follow @yourusername 🚀',
             style: {
               fontSize: TYPOGRAPHY.footer[mode].fontSize,
               fontWeight: TYPOGRAPHY.footer[mode].fontWeight,
@@ -468,7 +468,7 @@ export const templates: Template[] = [
             y: LAYOUT.SAFE_PADDING + LAYOUT.HEADER_HEIGHT / 2,
             width: contentWidth,
             height: 40,
-            content: '@conceptstocode',
+            content: '@yourusername',
             style: {
               fontSize: TYPOGRAPHY.username[mode].fontSize,
               fontWeight: TYPOGRAPHY.username[mode].fontWeight,
@@ -517,7 +517,7 @@ export const templates: Template[] = [
             y: canvasHeight - LAYOUT.SAFE_PADDING - LAYOUT.FOOTER_HEIGHT / 2,
             width: contentWidth,
             height: LAYOUT.FOOTER_HEIGHT,
-            content: 'Swipe 👉 | Follow @conceptstocode',
+            content: 'Swipe 👉 | Follow @yourusername',
             style: {
               fontSize: TYPOGRAPHY.footer[mode].fontSize,
               fontWeight: TYPOGRAPHY.footer[mode].fontWeight,

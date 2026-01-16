@@ -40,7 +40,7 @@ export const SlidesPanel: React.FC<SlidesPanelProps> = ({
   };
 
   return (
-    <div className="w-56 bg-card border-r border-border flex flex-col h-full">
+    <div className="w-56 bg-card border-r border-border flex flex-col h-full ">
       <div className="p-3 border-b border-border">
         <h2 className="text-sm font-semibold text-foreground">Slides</h2>
         <p className="text-xs text-muted-foreground mt-1">

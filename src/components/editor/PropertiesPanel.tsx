@@ -55,7 +55,7 @@ const presetColors = [
 ];
 
 const gradientPresets = [
-  { from: '#0f172a', to: '#020617', name: 'ConceptsToCode Dark' },
+  { from: '#0f172a', to: '#020617', name: 'Favourite' },
   { from: '#0b1120', to: '#0f172a', name: 'Slate Dark' },
   { from: '#0f0c29', to: '#302b63', name: 'Purple Night' },
   { from: '#0c1220', to: '#1e3a5f', name: 'Ocean' },
@@ -317,7 +317,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               }}
               onClick={() => onSetTheme(preset)}
             >
-              <span className="text-xs font-medium text-white">{preset.name}</span>
+              <span className={`text-xs font-medium ${preset.mode === 'dark' ? 'text-white' : 'text-black'}`}>{preset.name}</span>
             </button>
           ))}
         </div>
@@ -377,7 +377,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   );
 
   return (
-    <div className="w-72 bg-card border-l border-border flex flex-col h-full">
+    <div className="w-72 bg-card border-l border-border flex flex-col h-full overflow-y-scroll">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
         <TabsList className="w-full rounded-none border-b border-border bg-transparent p-0">
           <TabsTrigger

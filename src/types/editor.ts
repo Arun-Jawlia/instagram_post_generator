@@ -1,6 +1,6 @@
 export interface SlideElement {
   id: string;
-  type: 'text' | 'image' | 'shape' | 'logo';
+  type: 'text' | 'image' | 'shape' | 'logo' | 'icon';
   x: number;
   y: number;
   width: number;
@@ -8,7 +8,10 @@ export interface SlideElement {
   content?: string;
   style?: TextStyle;
   imageUrl?: string;
+  iconName?: string;
+  iconColor?: string;
   opacity?: number;
+  colorMode?: 'theme' | 'custom';
 }
 
 export interface TextStyle {
@@ -500,3 +503,52 @@ export const createDefaultSlide = (canvasWidth = 1080, canvasHeight = 1080, isDa
         },
   };
 };
+
+
+// Tech logos and icons available for slides
+export const techIcons = [
+  { name: 'React', icon: 'atom' },
+  { name: 'Node.js', icon: 'server' },
+  { name: 'TypeScript', icon: 'file-code-2' },
+  { name: 'JavaScript', icon: 'file-json' },
+  { name: 'Python', icon: 'terminal' },
+  { name: 'Database', icon: 'database' },
+  { name: 'API', icon: 'plug' },
+  { name: 'Cloud', icon: 'cloud' },
+  { name: 'Git', icon: 'git-branch' },
+  { name: 'Docker', icon: 'container' },
+  { name: 'AWS', icon: 'cloud-cog' },
+  { name: 'Mobile', icon: 'smartphone' },
+];
+
+export const arrowIcons = [
+  { name: 'Arrow Right', icon: 'arrow-right' },
+  { name: 'Arrow Left', icon: 'arrow-left' },
+  { name: 'Arrow Up', icon: 'arrow-up' },
+  { name: 'Arrow Down', icon: 'arrow-down' },
+  { name: 'Arrow Up Right', icon: 'arrow-up-right' },
+  { name: 'Arrow Down Right', icon: 'arrow-down-right' },
+  { name: 'Chevron Right', icon: 'chevron-right' },
+  { name: 'Chevron Left', icon: 'chevron-left' },
+  { name: 'Move Right', icon: 'move-right' },
+  { name: 'Corner Down Right', icon: 'corner-down-right' },
+];
+
+export const symbolIcons = [
+  { name: 'Check', icon: 'check' },
+  { name: 'Check Circle', icon: 'check-circle' },
+  { name: 'X', icon: 'x' },
+  { name: 'X Circle', icon: 'x-circle' },
+  { name: 'Star', icon: 'star' },
+  { name: 'Heart', icon: 'heart' },
+  { name: 'Zap', icon: 'zap' },
+  { name: 'Fire', icon: 'flame' },
+  { name: 'Rocket', icon: 'rocket' },
+  { name: 'Target', icon: 'target' },
+  { name: 'Trophy', icon: 'trophy' },
+  { name: 'Lightbulb', icon: 'lightbulb' },
+  { name: 'Sparkles', icon: 'sparkles' },
+  { name: 'Crown', icon: 'crown' },
+  { name: 'Medal', icon: 'medal' },
+  { name: 'Gem', icon: 'gem' },
+];

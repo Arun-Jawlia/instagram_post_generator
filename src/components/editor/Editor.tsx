@@ -9,6 +9,7 @@ import { TemplatesGallery } from './TemplatesGallery';
 import { useEditor } from '@/hooks/useEditor';
 import { SlideElement, Slide } from '@/types/editor';
 import { motion } from 'framer-motion';
+import { IconPicker } from './IconPicker';
 import { LayoutTemplate } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -45,6 +46,7 @@ export const Editor: React.FC = () => {
   const [scale, setScale] = useState(0.5);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [templatesOpen, setTemplatesOpen] = useState(false);
+  const [iconPickerOpen, setIconPickerOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleAddText = useCallback(() => {
@@ -124,10 +126,26 @@ export const Editor: React.FC = () => {
     addSlideFromTemplate(slide);
   }, [addSlideFromTemplate]);
 
+  const handleAddIcon = useCallback((iconName: string) => {
+    saveToHistory();
+    const centerX = state.canvasSize.width / 2;
+    const centerY = state.canvasSize.height / 2;
+    addElement({
+      type: 'icon',
+      x: centerX,
+      y: centerY,
+      width: 80,
+      height: 80,
+      iconName,
+      iconColor: state.theme.primaryColor,
+      colorMode: 'theme',
+    });
+  }, [addElement, saveToHistory, state.canvasSize, state.theme]);
+
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
       <Header />
-      
+
       <input
         ref={fileInputRef}
         type="file"
@@ -140,6 +158,7 @@ export const Editor: React.FC = () => {
         onAddText={handleAddText}
         onAddBulletList={handleAddBulletList}
         onAddImage={handleAddImage}
+        onAddIcon={() => setIconPickerOpen(true)}
         onOpenTemplates={() => setTemplatesOpen(true)}
         onUndo={undo}
         onRedo={redo}
@@ -208,6 +227,12 @@ export const Editor: React.FC = () => {
         canvasSize={state.canvasSize}
         theme={state.theme}
         onSelectTemplate={handleSelectTemplate}
+      />
+
+      <IconPicker
+        open={iconPickerOpen}
+        onOpenChange={setIconPickerOpen}
+        onSelectIcon={handleAddIcon}
       />
     </div>
   );

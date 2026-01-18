@@ -12,6 +12,7 @@ import {
   AlignCenter,
   AlignRight,
   LayoutTemplate,
+  Shapes,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -26,6 +27,7 @@ interface ToolbarProps {
   onAddText: () => void;
   onAddBulletList: () => void;
   onAddImage: () => void;
+  onAddIcon: () => void;
   onOpenTemplates: () => void;
   onUndo: () => void;
   onRedo: () => void;
@@ -42,6 +44,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   onAddText,
   onAddBulletList,
   onAddImage,
+  onAddIcon,
   onOpenTemplates,
   onUndo,
   onRedo,
@@ -104,6 +107,20 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             </Button>
           </TooltipTrigger>
           <TooltipContent>Add Image</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="toolbar-button"
+              onClick={onAddIcon}
+            >
+              <Shapes className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Add Icon / Symbol</TooltipContent>
         </Tooltip>
 
         <Tooltip>

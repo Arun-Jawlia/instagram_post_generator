@@ -30,16 +30,20 @@ const fontFamilies = [
   { name: 'Nunito', category: 'Sans-serif' },
   { name: 'Space Grotesk', category: 'Sans-serif' },
   { name: 'Roboto', category: 'Sans-serif' },
+
   // Serif fonts
   { name: 'Playfair Display', category: 'Serif' },
   { name: 'Merriweather', category: 'Serif' },
+
   // Display fonts
   { name: 'Oswald', category: 'Display' },
+
   // Monospace fonts
   { name: 'JetBrains Mono', category: 'Monospace' },
   { name: 'Fira Code', category: 'Monospace' },
   { name: 'Source Code Pro', category: 'Monospace' },
 ];
+
 
 const presetColors = [
   '#ffffff',

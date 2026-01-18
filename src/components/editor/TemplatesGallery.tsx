@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { FileText, List, Quote, Code, Megaphone, Layout, Square } from 'lucide-react';
+import { FileText, List, Quote, Code, Megaphone, Layout, Square, GitCompare, BarChart3, ListOrdered } from 'lucide-react';
 
 interface TemplatesGalleryProps {
   open: boolean;
@@ -26,6 +26,9 @@ const categoryIcons: Record<Template['category'], React.ReactNode> = {
   quote: <Quote className="h-5 w-5" />,
   code: <Code className="h-5 w-5" />,
   cta: <Megaphone className="h-5 w-5" />,
+  comparison: <GitCompare className="h-5 w-5" />,
+  stats: <BarChart3 className="h-5 w-5" />,
+  steps: <ListOrdered className="h-5 w-5" />,
 };
 
 const categoryLabels: Record<Template['category'], string> = {
@@ -36,6 +39,9 @@ const categoryLabels: Record<Template['category'], string> = {
   quote: 'Quote',
   code: 'Code',
   cta: 'CTA',
+  comparison: 'Compare',
+  stats: 'Stats',
+  steps: 'Steps',
 };
 
 export const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({

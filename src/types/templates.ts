@@ -4,7 +4,7 @@ export interface Template {
   id: string;
   name: string;
   description: string;
-  category: 'intro' | 'content' | 'tips' | 'code' | 'quote' | 'cta' | 'blank';
+  category: 'intro' | 'content' | 'tips' | 'code' | 'quote' | 'cta' | 'blank' | 'comparison' | 'stats' | 'steps';
   thumbnail?: string;
   createSlide: (canvasWidth: number, canvasHeight: number, isDark: boolean) => Slide;
 }

@@ -1,3 +1,5 @@
+export type ElementRole = 'title' | 'subtitle' | 'body' | 'username' | 'footer' | 'code' | 'custom';
+
 export interface SlideElement {
   id: string;
   type: 'text' | 'image' | 'shape' | 'logo' | 'icon';
@@ -10,7 +12,9 @@ export interface SlideElement {
   imageUrl?: string;
   iconName?: string;
   iconColor?: string;
+  iconUrl?: string; // For colorful icons from CDN
   opacity?: number;
+  role?: ElementRole;
   colorMode?: 'theme' | 'custom';
 }
 
@@ -65,12 +69,33 @@ export interface Theme {
   borderColor: string;
   fontFamily: string;
   headerFont: string;
+  // Role-specific colors with fallbacks
   titleColor?: string;
   subtitleColor?: string;
   bodyTextColor?: string;
   usernameColor?: string;
   footerTextColor?: string;
 }
+
+// Helper to get the appropriate color for an element role
+export const getThemeColorForRole = (theme: Theme, role?: ElementRole): string => {
+  switch (role) {
+    case 'title':
+      return theme.titleColor ?? theme.textColor;
+    case 'subtitle':
+      return theme.subtitleColor ?? theme.mutedColor;
+    case 'body':
+      return theme.bodyTextColor ?? theme.textColor;
+    case 'username':
+      return theme.usernameColor ?? theme.primaryColor;
+    case 'footer':
+      return theme.footerTextColor ?? theme.mutedColor;
+    case 'code':
+      return theme.primaryColor;
+    default:
+      return theme.textColor;
+  }
+};
 
 export interface EditorState {
   slides: Slide[];
@@ -88,7 +113,7 @@ export interface HistoryEntry {
   activeSlideIndex: number;
 }
 
-//  Dark Theme (Primary)
+// @conceptstocode Dark Theme (Primary)
 export const defaultTheme: Theme = {
   id: 'conceptstocode-dark',
   name: 'Favourite Dark',
@@ -113,7 +138,7 @@ export const defaultTheme: Theme = {
   subtitleColor: '#cbd5f5',
   bodyTextColor: '#e5e7eb',
   usernameColor: '#38bdf8',
-  footerTextColor: '#a78bfa',
+  footerTextColor: '#94a3b8',
 };
 
 // @mypage Light Theme
@@ -151,14 +176,17 @@ export const presetThemes: Theme[] = [
     mode: 'dark',
     background: {
       type: 'gradient',
-      gradient: { from: '#0f0c29', to: '#302b63', direction: 135 },
+      gradient: {
+        from: '#0f0c29',
+        to: '#302b63',
+        direction: 135,
+      },
     },
     primaryColor: '#a855f7',
     secondaryColor: '#ec4899',
     accentColor: '#fbbf24',
     mutedColor: '#94a3b8',
     borderColor: '#1e293b',
-
     textColor: '#e5e7eb',
     titleColor: '#f8fafc',
     subtitleColor: '#ddd6fe',
@@ -177,7 +205,11 @@ export const presetThemes: Theme[] = [
     mode: 'dark',
     background: {
       type: 'gradient',
-      gradient: { from: '#0c1220', to: '#1e3a5f', direction: 180 },
+      gradient: {
+        from: '#0c1220',
+        to: '#1e3a5f',
+        direction: 180,
+      },
     },
     primaryColor: '#3b82f6',
     secondaryColor: '#06b6d4',
@@ -221,8 +253,6 @@ export const presetThemes: Theme[] = [
     fontFamily: 'Inter',
     headerFont: 'JetBrains Mono',
   },
-
-  // ⚡ Cyber Neon
   {
     id: 'cyber-neon',
     name: 'Cyber Neon',
@@ -305,17 +335,10 @@ export const presetThemes: Theme[] = [
     background: { type: 'solid', color: '#ffffff' },
     primaryColor: '#2563eb',
     secondaryColor: '#16a34a',
-    accentColor: '#7c3aed',
-    mutedColor: '#64748b',
-    borderColor: '#e5e7eb',
-
-    textColor: '#1e293b',
-    titleColor: '#0f172a',
-    subtitleColor: '#334155',
-    bodyTextColor: '#1e293b',
-    usernameColor: '#2563eb',
-    footerTextColor: '#64748b',
-
+    textColor: '#14532d',
+    accentColor: '#10b981',
+    mutedColor: '#166534',
+    borderColor: '#bbf7d0',
     fontFamily: 'Inter',
     headerFont: 'JetBrains Mono',
   },
@@ -342,8 +365,6 @@ export const presetThemes: Theme[] = [
     fontFamily: 'Inter',
     headerFont: 'JetBrains Mono',
   },
-
-  // ☕ Coffee Code
   {
     id: 'coffee-code',
     name: 'Coffee Code',
@@ -409,7 +430,7 @@ export const TYPOGRAPHY = {
   },
 };
 
-export const createDefaultSlide = (canvasWidth = 1080, canvasHeight = 1080, isDark = true): Slide => {
+export const createDefaultSlide = (canvasWidth = 1080, canvasHeight = 1350, isDark = true): Slide => {
   const centerX = canvasWidth / 2;
   const contentWidth = canvasWidth - (LAYOUT.SAFE_PADDING * 2);
   const mode = isDark ? 'dark' : 'light';

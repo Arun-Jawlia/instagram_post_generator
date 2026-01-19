@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { SlideElement, Theme, Background, CanvasSize, presetThemes, canvasSizePresets } from '@/types/editor';
+import { Switch } from '@/components/ui/switch';
+import { SlideElement, Theme, Background, CanvasSize, presetThemes, canvasSizePresets, ElementRole, getThemeColorForRole } from '@/types/editor';
 
 interface PropertiesPanelProps {
   selectedElement: SlideElement | null;
@@ -30,20 +31,16 @@ const fontFamilies = [
   { name: 'Nunito', category: 'Sans-serif' },
   { name: 'Space Grotesk', category: 'Sans-serif' },
   { name: 'Roboto', category: 'Sans-serif' },
-
   // Serif fonts
   { name: 'Playfair Display', category: 'Serif' },
   { name: 'Merriweather', category: 'Serif' },
-
   // Display fonts
   { name: 'Oswald', category: 'Display' },
-
   // Monospace fonts
   { name: 'JetBrains Mono', category: 'Monospace' },
   { name: 'Fira Code', category: 'Monospace' },
   { name: 'Source Code Pro', category: 'Monospace' },
 ];
-
 
 const presetColors = [
   '#ffffff',
@@ -65,6 +62,16 @@ const gradientPresets = [
   { from: '#0c1220', to: '#1e3a5f', name: 'Ocean' },
   { from: '#0a120a', to: '#1a2f1a', name: 'Forest' },
   { from: '#1a0a0a', to: '#2f1a1a', name: 'Crimson' },
+];
+
+const elementRoles: { value: ElementRole; label: string }[] = [
+  { value: 'title', label: 'Title' },
+  { value: 'subtitle', label: 'Subtitle' },
+  { value: 'body', label: 'Body Text' },
+  { value: 'username', label: 'Username' },
+  { value: 'footer', label: 'Footer' },
+  { value: 'code', label: 'Code' },
+  { value: 'custom', label: 'Custom' },
 ];
 
 export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
@@ -103,6 +110,29 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
     }
 
     if (selectedElement.type === 'text') {
+      const isCustomColor = selectedElement.colorMode === 'custom';
+      
+      const handleRoleChange = (newRole: ElementRole) => {
+        const newColor = getThemeColorForRole(theme, newRole);
+        onUpdateElement(selectedElement.id, { 
+          role: newRole,
+          colorMode: 'theme',
+          style: { ...selectedElement.style!, color: newColor }
+        });
+      };
+
+      const handleColorModeToggle = (useCustom: boolean) => {
+        if (useCustom) {
+          onUpdateElement(selectedElement.id, { colorMode: 'custom' });
+        } else {
+          const newColor = getThemeColorForRole(theme, selectedElement.role);
+          onUpdateElement(selectedElement.id, { 
+            colorMode: 'theme',
+            style: { ...selectedElement.style!, color: newColor }
+          });
+        }
+      };
+
       return (
         <div className="space-y-4">
           <div className="panel-section">
@@ -115,6 +145,24 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               }
               placeholder="Enter text..."
             />
+          </div>
+
+          <div className="panel-section">
+            <Label className="panel-title">Element Role</Label>
+            <select
+              className="w-full p-2 bg-secondary border-0 rounded-lg text-foreground text-sm input-field"
+              value={selectedElement.role || 'body'}
+              onChange={(e) => handleRoleChange(e.target.value as ElementRole)}
+            >
+              {elementRoles.map((role) => (
+                <option key={role.value} value={role.value}>
+                  {role.label}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-muted-foreground mt-1">
+              Role determines color on theme change
+            </p>
           </div>
 
           <div className="panel-section">
@@ -192,31 +240,51 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           </div>
 
           <div className="panel-section">
-            <Label className="panel-title">Text Color</Label>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {presetColors.map((color) => (
-                <button
-                  key={color}
-                  className="color-swatch"
-                  style={{ backgroundColor: color }}
-                  onClick={() =>
+            <div className="flex items-center justify-between mb-2">
+              <Label className="panel-title mb-0">Text Color</Label>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">
+                  {isCustomColor ? 'Custom' : 'Theme'}
+                </span>
+                <Switch
+                  checked={isCustomColor}
+                  onCheckedChange={handleColorModeToggle}
+                />
+              </div>
+            </div>
+            {isCustomColor && (
+              <>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {presetColors.map((color) => (
+                    <button
+                      key={color}
+                      className="color-swatch"
+                      style={{ backgroundColor: color }}
+                      onClick={() =>
+                        onUpdateElement(selectedElement.id, {
+                          style: { ...selectedElement.style!, color },
+                        })
+                      }
+                    />
+                  ))}
+                </div>
+                <Input
+                  type="color"
+                  value={selectedElement.style?.color || '#ffffff'}
+                  onChange={(e) =>
                     onUpdateElement(selectedElement.id, {
-                      style: { ...selectedElement.style!, color },
+                      style: { ...selectedElement.style!, color: e.target.value },
                     })
                   }
+                  className="mt-2 h-10 input-field"
                 />
-              ))}
-            </div>
-            <Input
-              type="color"
-              value={selectedElement.style?.color || '#ffffff'}
-              onChange={(e) =>
-                onUpdateElement(selectedElement.id, {
-                  style: { ...selectedElement.style!, color: e.target.value },
-                })
-              }
-              className="mt-2 h-10 input-field"
-            />
+              </>
+            )}
+            {!isCustomColor && (
+              <p className="text-xs text-muted-foreground mt-2">
+                Color follows theme ({selectedElement.role || 'body'} role)
+              </p>
+            )}
           </div>
 
           <div className="panel-section border-b-0">
@@ -287,6 +355,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
         <Label className="panel-title">Canvas Size</Label>
         <div className="grid grid-cols-1 gap-2">
           {canvasSizePresets.map((preset) => (
+            console.log(canvasSize, preset),
             <button
               key={preset.name}
               className={`canvas-size-button text-left ${

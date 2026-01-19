@@ -6,17 +6,10 @@ import { Canvas } from './Canvas';
 import { PropertiesPanel } from './PropertiesPanel';
 import { ExportDialog } from './ExportDialog';
 import { TemplatesGallery } from './TemplatesGallery';
-import { useEditor } from '@/hooks/useEditor';
-import { SlideElement, Slide } from '@/types/editor';
-import { motion } from 'framer-motion';
 import { IconPicker } from './IconPicker';
-import { LayoutTemplate } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { useEditor } from '@/hooks/useEditor';
+import { SlideElement, Slide, getThemeColorForRole } from '@/types/editor';
+import { motion } from 'framer-motion';
 
 export const Editor: React.FC = () => {
   const {
@@ -28,9 +21,10 @@ export const Editor: React.FC = () => {
     setActiveSlide,
     setCanvasSize,
     addSlide,
-    addSlideFromTemplate,
+    applyTemplateToSlide,
     duplicateSlide,
     deleteSlide,
+    reorderSlides,
     updateSlideBackground,
     addElement,
     updateElement,
@@ -46,7 +40,7 @@ export const Editor: React.FC = () => {
   const [scale, setScale] = useState(0.5);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [templatesOpen, setTemplatesOpen] = useState(false);
-  const [iconPickerOpen, setIconPickerOpen] = useState(false)
+  const [iconPickerOpen, setIconPickerOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleAddText = useCallback(() => {
@@ -60,15 +54,17 @@ export const Editor: React.FC = () => {
       width: 600,
       height: 60,
       content: 'New Text',
+      role: 'body',
+      colorMode: 'theme',
       style: {
         fontSize: 32,
         fontWeight: 500,
         fontFamily: 'Inter',
-        color: state.theme.mode === 'dark' ? '#ffffff' : '#0f172a',
+        color: getThemeColorForRole(state.theme, 'body'),
         textAlign: 'center',
       },
     });
-  }, [addElement, saveToHistory, state.canvasSize, state.theme.mode]);
+  }, [addElement, saveToHistory, state.canvasSize, state.theme]);
 
   const handleAddBulletList = useCallback(() => {
     saveToHistory();
@@ -81,16 +77,18 @@ export const Editor: React.FC = () => {
       width: 800,
       height: 200,
       content: '• First point\n• Second point\n• Third point',
+      role: 'body',
+      colorMode: 'theme',
       style: {
         fontSize: 26,
         fontWeight: 400,
         fontFamily: 'Inter',
-        color: state.theme.mode === 'dark' ? '#e5e7eb' : '#0f172a',
+        color: getThemeColorForRole(state.theme, 'body'),
         textAlign: 'left',
         lineHeight: 1.5,
       },
     });
-  }, [addElement, saveToHistory, state.canvasSize, state.theme.mode]);
+  }, [addElement, saveToHistory, state.canvasSize, state.theme]);
 
   const handleAddImage = useCallback(() => {
     fileInputRef.current?.click();
@@ -123,29 +121,45 @@ export const Editor: React.FC = () => {
   }, [updateElement]);
 
   const handleSelectTemplate = useCallback((slide: Slide) => {
-    addSlideFromTemplate(slide);
-  }, [addSlideFromTemplate]);
+    applyTemplateToSlide(slide);
+  }, [applyTemplateToSlide]);
 
-  const handleAddIcon = useCallback((iconName: string) => {
+  const handleAddIcon = useCallback((iconName: string, isColorful?: boolean, colorfulUrl?: string) => {
     saveToHistory();
     const centerX = state.canvasSize.width / 2;
     const centerY = state.canvasSize.height / 2;
-    addElement({
-      type: 'icon',
-      x: centerX,
-      y: centerY,
-      width: 80,
-      height: 80,
-      iconName,
-      iconColor: state.theme.primaryColor,
-      colorMode: 'theme',
-    });
+    
+    if (isColorful && colorfulUrl) {
+      // Colorful icon from CDN
+      addElement({
+        type: 'icon',
+        x: centerX,
+        y: centerY,
+        width: 80,
+        height: 80,
+        iconName,
+        iconUrl: colorfulUrl,
+        colorMode: 'custom',
+      });
+    } else {
+      // Lucide icon
+      addElement({
+        type: 'icon',
+        x: centerX,
+        y: centerY,
+        width: 80,
+        height: 80,
+        iconName,
+        iconColor: state.theme.primaryColor,
+        colorMode: 'theme',
+      });
+    }
   }, [addElement, saveToHistory, state.canvasSize, state.theme]);
 
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
       <Header />
-
+      
       <input
         ref={fileInputRef}
         type="file"
@@ -179,6 +193,7 @@ export const Editor: React.FC = () => {
           onAddSlide={addSlide}
           onDuplicateSlide={duplicateSlide}
           onDeleteSlide={deleteSlide}
+          onReorderSlides={reorderSlides}
         />
 
         <motion.main
@@ -219,6 +234,7 @@ export const Editor: React.FC = () => {
         open={exportDialogOpen}
         onOpenChange={setExportDialogOpen}
         slides={state.slides}
+        canvasSize={state.canvasSize}
       />
 
       <TemplatesGallery

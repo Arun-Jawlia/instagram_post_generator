@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -6,71 +6,79 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Download, Image, FolderArchive, Check } from 'lucide-react';
-import { Slide } from '@/types/editor';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Download, Image, FolderArchive, Check } from "lucide-react";
+import { Slide } from "@/types/editor";
+import { getIconSvg } from "@/lib/iconPaths";
 
 interface ExportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   slides: Slide[];
+  canvasSize: { width: number; height: number };
 }
 
 export const ExportDialog: React.FC<ExportDialogProps> = ({
   open,
   onOpenChange,
   slides,
+  canvasSize = {
+    width: 1080,
+    height: 1080,
+  },
 }) => {
   const [exporting, setExporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [completed, setCompleted] = useState(false);
 
-  const CANVAS_SIZE = 1080;
 
-  const renderSlideToCanvas = async (slide: Slide): Promise<HTMLCanvasElement> => {
-    const canvas = document.createElement('canvas');
-    canvas.width = CANVAS_SIZE;
-    canvas.height = CANVAS_SIZE;
-    const ctx = canvas.getContext('2d')!;
+  const renderSlideToCanvas = async (
+    slide: Slide,
+  ): Promise<HTMLCanvasElement> => {
+    const canvas = document.createElement("canvas");
+    canvas.width = canvasSize.width;
+    canvas.height = canvasSize.height;
+    const ctx = canvas.getContext("2d")!;
 
     // Draw background
-    if (slide.background.type === 'solid' && slide.background.color) {
+    if (slide.background.type === "solid" && slide.background.color) {
       ctx.fillStyle = slide.background.color;
-      ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      ctx.fillRect(0, 0, canvasSize.width, canvasSize.height);
     } else if (slide.background.gradient) {
       const { from, to, direction } = slide.background.gradient;
       const angle = (direction * Math.PI) / 180;
-      const x1 = CANVAS_SIZE / 2 - Math.cos(angle) * CANVAS_SIZE;
-      const y1 = CANVAS_SIZE / 2 - Math.sin(angle) * CANVAS_SIZE;
-      const x2 = CANVAS_SIZE / 2 + Math.cos(angle) * CANVAS_SIZE;
-      const y2 = CANVAS_SIZE / 2 + Math.sin(angle) * CANVAS_SIZE;
-      
+      const x1 = canvasSize.width / 2 - Math.cos(angle) * canvasSize.width;
+      const y1 = canvasSize.height / 2 - Math.sin(angle) * canvasSize.height;
+      const x2 = canvasSize.width / 2 + Math.cos(angle) * canvasSize.width;
+      const y2 = canvasSize.height / 2 + Math.sin(angle) * canvasSize.height;
+
       const gradient = ctx.createLinearGradient(x1, y1, x2, y2);
       gradient.addColorStop(0, from);
       gradient.addColorStop(1, to);
       ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      ctx.fillRect(0, 0, canvasSize.width, canvasSize.height);
     }
 
     // Draw elements
     for (const element of slide.elements) {
-      if (element.type === 'text' && element.content) {
+      if (element.type === "text" && element.content) {
         ctx.save();
-        ctx.fillStyle = element.style?.color || '#ffffff';
-        ctx.font = `${element.style?.fontWeight || 400} ${element.style?.fontSize || 16}px ${element.style?.fontFamily || 'Inter'}`;
-        ctx.textAlign = element.style?.textAlign || 'left';
-        ctx.textBaseline = 'middle';
+        ctx.fillStyle = element.style?.color || "#ffffff";
+        ctx.font = `${element.style?.fontWeight || 400} ${element.style?.fontSize || 16}px ${element.style?.fontFamily || "Inter"}`;
+        ctx.textAlign = element.style?.textAlign || "left";
+        ctx.textBaseline = "middle";
 
-        const x = element.style?.textAlign === 'center' 
-          ? element.x 
-          : element.style?.textAlign === 'right'
-          ? element.x + element.width / 2
-          : element.x - element.width / 2;
+        const x =
+          element.style?.textAlign === "center"
+            ? element.x
+            : element.style?.textAlign === "right"
+              ? element.x + element.width / 2
+              : element.x - element.width / 2;
 
         // Handle multi-line text
-        const lines = element.content.split('\n');
+        const lines = element.content.split("\n");
         const lineHeight = (element.style?.fontSize || 16) * 1.4;
         const totalHeight = lines.length * lineHeight;
         const startY = element.y - totalHeight / 2 + lineHeight / 2;
@@ -82,10 +90,10 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
         ctx.restore();
       }
 
-      if (element.type === 'image' && element.imageUrl) {
+      if (element.type === "image" && element.imageUrl) {
         await new Promise<void>((resolve) => {
           const img = new window.Image();
-          img.crossOrigin = 'anonymous';
+          img.crossOrigin = "anonymous";
           img.onload = () => {
             const x = element.x - element.width / 2;
             const y = element.y - element.height / 2;
@@ -96,6 +104,51 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
           img.src = element.imageUrl!;
         });
       }
+
+      // Draw icons
+      if (element.type === "icon") {
+        const x = element.x - element.width / 2;
+        const y = element.y - element.height / 2;
+
+        // Colorful icon from CDN
+        if (element.iconUrl) {
+          await new Promise<void>((resolve) => {
+            const img = new window.Image();
+            img.crossOrigin = "anonymous";
+            img.onload = () => {
+              ctx.drawImage(img, x, y, element.width, element.height);
+              resolve();
+            };
+            img.onerror = () => resolve();
+            img.src = element.iconUrl!;
+          });
+        } else if (element.iconName) {
+          // Lucide icon - render as SVG
+          await new Promise<void>((resolve) => {
+            const iconColor = element.iconColor || "#ffffff";
+            const size = Math.min(element.width, element.height);
+
+            // Create SVG string for the icon
+            const svgString = getIconSvg(element.iconName!, iconColor, size);
+            const svgBlob = new Blob([svgString], {
+              type: "image/svg+xml;charset=utf-8",
+            });
+            const url = URL.createObjectURL(svgBlob);
+
+            const img = new window.Image();
+            img.onload = () => {
+              ctx.drawImage(img, x, y, element.width, element.height);
+              URL.revokeObjectURL(url);
+              resolve();
+            };
+            img.onerror = () => {
+              URL.revokeObjectURL(url);
+              resolve();
+            };
+            img.src = url;
+          });
+        }
+      }
     }
 
     return canvas;
@@ -104,10 +157,10 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
   const exportSingleImage = async (slideIndex: number) => {
     const slide = slides[slideIndex];
     const canvas = await renderSlideToCanvas(slide);
-    
-    const link = document.createElement('a');
+
+    const link = document.createElement("a");
     link.download = `slide-${slideIndex + 1}.png`;
-    link.href = canvas.toDataURL('image/png');
+    link.href = canvas.toDataURL("image/png");
     link.click();
   };
 
@@ -117,24 +170,24 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
     setCompleted(false);
 
     try {
-      const JSZip = (await import('jszip')).default;
-      const { saveAs } = await import('file-saver');
-      
+      const JSZip = (await import("jszip")).default;
+      const { saveAs } = await import("file-saver");
+
       const zip = new JSZip();
 
       for (let i = 0; i < slides.length; i++) {
         const canvas = await renderSlideToCanvas(slides[i]);
         const blob = await new Promise<Blob>((resolve) => {
-          canvas.toBlob((blob) => resolve(blob!), 'image/png');
+          canvas.toBlob((blob) => resolve(blob!), "image/png");
         });
-        
+
         zip.file(`slide-${i + 1}.png`, blob);
         setProgress(((i + 1) / slides.length) * 100);
       }
 
-      const content = await zip.generateAsync({ type: 'blob' });
-      saveAs(content, 'instagram-carousel.zip');
-      
+      const content = await zip.generateAsync({ type: "blob" });
+      saveAs(content, "instagram-carousel.zip");
+
       setCompleted(true);
       setTimeout(() => {
         setExporting(false);
@@ -142,7 +195,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
         onOpenChange(false);
       }, 1500);
     } catch (error) {
-      console.error('Export failed:', error);
+      console.error("Export failed:", error);
       setExporting(false);
     }
   };
@@ -218,7 +271,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
 
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            {exporting ? 'Close' : 'Cancel'}
+            {exporting ? "Close" : "Cancel"}
           </Button>
         </DialogFooter>
       </DialogContent>

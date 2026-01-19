@@ -1,8 +1,8 @@
-import React from 'react';
-import { Plus, Copy, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Plus, Copy, Trash2, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slide } from '@/types/editor';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import {
   Tooltip,
   TooltipContent,
@@ -16,6 +16,7 @@ interface SlidesPanelProps {
   onAddSlide: () => void;
   onDuplicateSlide: (index: number) => void;
   onDeleteSlide: (index: number) => void;
+  onReorderSlides: (fromIndex: number, toIndex: number) => void;
 }
 
 export const SlidesPanel: React.FC<SlidesPanelProps> = ({
@@ -25,7 +26,10 @@ export const SlidesPanel: React.FC<SlidesPanelProps> = ({
   onAddSlide,
   onDuplicateSlide,
   onDeleteSlide,
+  onReorderSlides,
 }) => {
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
   const getBackgroundStyle = (slide: Slide) => {
     if (slide.background.type === 'solid') {
       return { backgroundColor: slide.background.color };
@@ -39,12 +43,28 @@ export const SlidesPanel: React.FC<SlidesPanelProps> = ({
     return {};
   };
 
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+  };
+
+  const handleDragOver = (e: React.DragEvent, targetIndex: number) => {
+    e.preventDefault();
+    if (draggedIndex !== null && draggedIndex !== targetIndex) {
+      onReorderSlides(draggedIndex, targetIndex);
+      setDraggedIndex(targetIndex);
+    }
+  };
+
   return (
-    <div className="w-56 bg-card border-r border-border flex flex-col h-full ">
+    <div className="w-56 bg-card border-r border-border flex flex-col h-full">
       <div className="p-3 border-b border-border">
         <h2 className="text-sm font-semibold text-foreground">Slides</h2>
         <p className="text-xs text-muted-foreground mt-1">
-          {slides.length} slide{slides.length !== 1 ? 's' : ''}
+          {slides.length} slide{slides.length !== 1 ? 's' : ''} • Drag to reorder
         </p>
       </div>
 
@@ -56,7 +76,11 @@ export const SlidesPanel: React.FC<SlidesPanelProps> = ({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="group relative"
+              className={`group relative ${draggedIndex === index ? 'opacity-50' : ''}`}
+              draggable
+              onDragStart={() => handleDragStart(index)}
+              onDragEnd={handleDragEnd}
+              onDragOver={(e) => handleDragOver(e, index)}
             >
               <div
                 className={`slide-thumbnail aspect-square ${
@@ -65,6 +89,13 @@ export const SlidesPanel: React.FC<SlidesPanelProps> = ({
                 style={getBackgroundStyle(slide)}
                 onClick={() => onSelectSlide(index)}
               >
+                {/* Drag handle */}
+                <div className="absolute top-1 left-1 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="p-1 rounded bg-black/30 backdrop-blur-sm">
+                    <GripVertical className="h-3 w-3 text-white/70" />
+                  </div>
+                </div>
+
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-white/50 text-xs font-medium">
                     {index + 1}

@@ -1,8 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Slide, SlideElement, CanvasSize } from '@/types/editor';
 import { motion } from 'framer-motion';
-import * as LucideIcons from 'lucide-react'
-import { LucideIcon } from 'lucide-react'
+import * as LucideIcons from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
 
 interface CanvasProps {
   slide: Slide;
@@ -16,7 +16,7 @@ interface CanvasProps {
 
 interface IDragging { id: string; startX: number; startY: number; elemX: number; elemY: number }
 
-interface IResizing { id: string; startX: number; startY: number; startWidth: number; startHeight: number }
+interface IResizing { id: string; startX: number; startY: number; startWidth: number; startHeight: number, aspectRatio?: number }
 
 export const Canvas: React.FC<CanvasProps> = ({
   slide,
@@ -30,7 +30,7 @@ export const Canvas: React.FC<CanvasProps> = ({
   const canvasRef = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState<IDragging | null>(null);
   const [resizing, setResizing] = useState<IResizing | null>(null);
-
+  
   const CANVAS_WIDTH = canvasSize.width;
   const CANVAS_HEIGHT = canvasSize.height;
 
@@ -50,11 +50,11 @@ export const Canvas: React.FC<CanvasProps> = ({
   const getCanvasCoordinates = (clientX: number, clientY: number) => {
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return { x: 0, y: 0 };
-
+    
     // The rect is already scaled, so we need to convert to unscaled coordinates
     const x = (clientX - rect.left) / scale;
     const y = (clientY - rect.top) / scale;
-
+    
     return { x, y };
   };
 
@@ -62,7 +62,7 @@ export const Canvas: React.FC<CanvasProps> = ({
     e.preventDefault();
     e.stopPropagation();
     onSelectElement(element.id);
-
+    
     const { x, y } = getCanvasCoordinates(e.clientX, e.clientY);
 
     setDragging({
@@ -77,13 +77,17 @@ export const Canvas: React.FC<CanvasProps> = ({
   const handleResizeMouseDown = (e: React.MouseEvent, element: SlideElement) => {
     e.preventDefault();
     e.stopPropagation();
-
+    
+    // Calculate aspect ratio for images
+    const aspectRatio = element.type === 'image' ? element.width / element.height : undefined;
+    
     setResizing({
       id: element.id,
       startX: e.clientX,
       startY: e.clientY,
       startWidth: element.width,
       startHeight: element.height,
+      aspectRatio,
     });
   };
 
@@ -103,12 +107,20 @@ export const Canvas: React.FC<CanvasProps> = ({
 
       if (resizing) {
         const deltaX = (e.clientX - resizing.startX) / scale;
-        const deltaY = (e.clientY - resizing.startY) / scale;
-
-        onUpdateElement(resizing.id, {
-          width: Math.max(50, resizing.startWidth + deltaX),
-          height: Math.max(30, resizing.startHeight + deltaY),
-        });
+        const element = slide.elements.find(el => el.id === resizing.id);
+        
+        if (element?.type === 'image' && resizing.aspectRatio) {
+          // Maintain aspect ratio for images
+          const newWidth = Math.max(50, resizing.startWidth + deltaX);
+          const newHeight = newWidth / resizing.aspectRatio;
+          onUpdateElement(resizing.id, { width: newWidth, height: newHeight });
+        } else {
+          const deltaY = (e.clientY - resizing.startY) / scale;
+          onUpdateElement(resizing.id, {
+            width: Math.max(50, resizing.startWidth + deltaX),
+            height: Math.max(30, resizing.startHeight + deltaY),
+          });
+        }
       }
     };
 
@@ -145,7 +157,7 @@ export const Canvas: React.FC<CanvasProps> = ({
       .split('-')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join('');
-
+    
     return (LucideIcons as unknown as Record<string, LucideIcon>)[pascalCaseName] || null;
   };
 
@@ -170,8 +182,8 @@ export const Canvas: React.FC<CanvasProps> = ({
             ...commonStyle,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: element.style?.textAlign === 'center' ? 'center' :
-              element.style?.textAlign === 'right' ? 'flex-end' : 'flex-start',
+            justifyContent: element.style?.textAlign === 'center' ? 'center' : 
+                           element.style?.textAlign === 'right' ? 'flex-end' : 'flex-start',
           }}
           className={`group ${isSelected ? 'ring-2 ring-primary ring-offset-2 ring-offset-transparent' : 'hover:ring-1 hover:ring-primary/50'}`}
           onMouseDown={(e) => handleMouseDown(e, element)}
@@ -214,6 +226,7 @@ export const Canvas: React.FC<CanvasProps> = ({
               src={element.imageUrl}
               alt=""
               className="w-full h-full object-contain pointer-events-none"
+              style={{ objectFit: 'contain' }}
               draggable={false}
             />
           ) : (
@@ -230,33 +243,63 @@ export const Canvas: React.FC<CanvasProps> = ({
         </div>
       );
     }
-    if (element.type === 'icon' && element.iconName) {
-      const IconComponent = getIconComponent(element.iconName);
-      if (!IconComponent) return null;
 
-      return (
-        <div
-          key={element.id}
-          style={commonStyle}
-          className={`group flex items-center justify-center ${isSelected ? 'ring-2 ring-primary ring-offset-2 ring-offset-transparent' : 'hover:ring-1 hover:ring-primary/50'}`}
-          onMouseDown={(e) => handleMouseDown(e, element)}
-        >
-          <IconComponent
-            style={{
-              width: '100%',
-              height: '100%',
-              color: element.iconColor || '#ffffff',
-            }}
-            strokeWidth={1.5}
-          />
-          {isSelected && (
-            <div
-              className="absolute bottom-0 right-0 w-5 h-5 bg-primary rounded-full cursor-se-resize transform translate-x-1/2 translate-y-1/2 z-10 hover:scale-110 transition-transform"
-              onMouseDown={(e) => handleResizeMouseDown(e, element)}
+    if (element.type === 'icon') {
+      // Colorful icon from CDN
+      if (element.iconUrl) {
+        return (
+          <div
+            key={element.id}
+            style={commonStyle}
+            className={`group flex items-center justify-center ${isSelected ? 'ring-2 ring-primary ring-offset-2 ring-offset-transparent' : 'hover:ring-1 hover:ring-primary/50'}`}
+            onMouseDown={(e) => handleMouseDown(e, element)}
+          >
+            <img
+              src={element.iconUrl}
+              alt={element.iconName || 'icon'}
+              className="w-full h-full object-contain pointer-events-none"
+              draggable={false}
+              style={{ objectFit: 'contain' }}
             />
-          )}
-        </div>
-      );
+            {isSelected && (
+              <div
+                className="absolute bottom-0 right-0 w-5 h-5 bg-primary rounded-full cursor-se-resize transform translate-x-1/2 translate-y-1/2 z-10 hover:scale-110 transition-transform"
+                onMouseDown={(e) => handleResizeMouseDown(e, element)}
+              />
+            )}
+          </div>
+        );
+      }
+      
+      // Lucide icon
+      if (element.iconName) {
+        const IconComponent = getIconComponent(element.iconName);
+        if (!IconComponent) return null;
+
+        return (
+          <div
+            key={element.id}
+            style={commonStyle}
+            className={`group flex items-center justify-center ${isSelected ? 'ring-2 ring-primary ring-offset-2 ring-offset-transparent' : 'hover:ring-1 hover:ring-primary/50'}`}
+            onMouseDown={(e) => handleMouseDown(e, element)}
+          >
+            <IconComponent
+              style={{
+                width: '100%',
+                height: '100%',
+                color: element.iconColor || '#ffffff',
+              }}
+              strokeWidth={1.5}
+            />
+            {isSelected && (
+              <div
+                className="absolute bottom-0 right-0 w-5 h-5 bg-primary rounded-full cursor-se-resize transform translate-x-1/2 translate-y-1/2 z-10 hover:scale-110 transition-transform"
+                onMouseDown={(e) => handleResizeMouseDown(e, element)}
+              />
+            )}
+          </div>
+        );
+      }
     }
 
     return null;

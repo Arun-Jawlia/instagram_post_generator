@@ -94,7 +94,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   onSetCanvasSize,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [activeTab, setActiveTab] = useState("theme");
+  const [activeTab, setActiveTab] = useState("element");
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

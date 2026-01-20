@@ -870,7 +870,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   );
 
   return (
-    <div className="w-72 bg-card border-l border-border flex flex-col h-full overflow-y-scroll">
+    <div className="w-96 bg-card border-l border-border flex flex-col h-full overflow-y-scroll">
       <Tabs
         value={activeTab}
         onValueChange={setActiveTab}

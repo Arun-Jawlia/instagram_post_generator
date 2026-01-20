@@ -18,6 +18,7 @@ interface ExportDialogProps {
   onOpenChange: (open: boolean) => void;
   slides: Slide[];
   canvasSize: { width: number; height: number };
+  selectedSlideIndex: number;
 }
 
 export const ExportDialog: React.FC<ExportDialogProps> = ({
@@ -28,6 +29,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
     width: 1080,
     height: 1080,
   },
+  selectedSlideIndex
 }) => {
   const [exporting, setExporting] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -239,7 +241,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
     const canvas = await renderSlideToCanvas(slide);
 
     const link = document.createElement("a");
-    link.download = `slide-${slideIndex + 1}.png`;
+    link.download = `slide-${slideIndex + 1}_${Date.now()}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
   };
@@ -261,7 +263,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
           canvas.toBlob((blob) => resolve(blob!), "image/png");
         });
 
-        zip.file(`slide-${i + 1}.png`, blob);
+        zip.file(`slide-${i + 1}_${Date.now()}.png`, blob);
         setProgress(((i + 1) / slides.length) * 100);
       }
 
@@ -318,7 +320,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
             <Button
               variant="outline"
               className="justify-start gap-3 h-auto py-4"
-              onClick={() => exportSingleImage(0)}
+              onClick={() => exportSingleImage(selectedSlideIndex || 0)}
             >
               <div className="p-2 rounded-lg bg-primary/10">
                 <Image className="h-5 w-5 text-primary" />

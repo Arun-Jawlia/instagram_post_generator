@@ -157,7 +157,7 @@ export const Editor: React.FC = () => {
   }, [addElement, saveToHistory, state.canvasSize, state.theme]);
 
   return (
-    <div className="h-screen flex flex-col bg-background overflow-hidden">
+    <div className="h-screen flex flex-col bg-background overflow-hidden w">
       <Header />
       
       <input
@@ -235,6 +235,7 @@ export const Editor: React.FC = () => {
         onOpenChange={setExportDialogOpen}
         slides={state.slides}
         canvasSize={state.canvasSize}
+        selectedSlideIndex={state.activeSlideIndex}
       />
 
       <TemplatesGallery

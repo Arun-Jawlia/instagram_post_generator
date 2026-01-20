@@ -313,7 +313,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
   onOpenChange,
   onSelectIcon,
 }) => {
-  const [activeTab, setActiveTab] = useState("tech");
+  const [activeTab, setActiveTab] = useState("colorful");
 
   const handleSelectIcon = (iconName: string) => {
     onSelectIcon(iconName);
@@ -382,19 +382,19 @@ export const IconPicker: React.FC<IconPickerProps> = ({
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="tech">Tech</TabsTrigger>
             <TabsTrigger value="colorful">Colorful</TabsTrigger>
+            <TabsTrigger value="tech">Tech</TabsTrigger>
             <TabsTrigger value="arrows">Arrows</TabsTrigger>
             <TabsTrigger value="symbols">Symbols</TabsTrigger>
           </TabsList>
 
           <ScrollArea className="h-[50vh] mt-4 pr-4">
-            <TabsContent value="tech" className="mt-0">
-              {renderIconGrid(techIcons)}
-            </TabsContent>
-
             <TabsContent value="colorful" className="mt-0">
               {renderColorfulIconGrid()}
+            </TabsContent>
+
+            <TabsContent value="tech" className="mt-0">
+              {renderIconGrid(techIcons)}
             </TabsContent>
 
             <TabsContent value="arrows" className="mt-0">

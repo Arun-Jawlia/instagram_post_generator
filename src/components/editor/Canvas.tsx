@@ -14,10 +14,6 @@ interface CanvasProps {
   scale?: number;
 }
 
-interface IDragging { id: string; startX: number; startY: number; elemX: number; elemY: number }
-
-interface IResizing { id: string; startX: number; startY: number; startWidth: number; startHeight: number, aspectRatio?: number }
-
 export const Canvas: React.FC<CanvasProps> = ({
   slide,
   selectedElementId,
@@ -28,8 +24,8 @@ export const Canvas: React.FC<CanvasProps> = ({
   scale = 0.5,
 }) => {
   const canvasRef = useRef<HTMLDivElement>(null);
-  const [dragging, setDragging] = useState<IDragging | null>(null);
-  const [resizing, setResizing] = useState<IResizing | null>(null);
+  const [dragging, setDragging] = useState<{ id: string; startX: number; startY: number; elemX: number; elemY: number } | null>(null);
+  const [resizing, setResizing] = useState<{ id: string; startX: number; startY: number; startWidth: number; startHeight: number; aspectRatio?: number } | null>(null);
   
   const CANVAS_WIDTH = canvasSize.width;
   const CANVAS_HEIGHT = canvasSize.height;
@@ -196,6 +192,15 @@ export const Canvas: React.FC<CanvasProps> = ({
               color: element.style?.color || '#ffffff',
               textAlign: element.style?.textAlign || 'left',
               lineHeight: element.style?.lineHeight || 1.4,
+              fontStyle: element.style?.fontStyle || 'normal',
+              textDecoration: element.style?.textDecoration || 'none',
+              textShadow: element.style?.textShadow?.enabled
+                ? `${element.style.textShadow.offsetX}px ${element.style.textShadow.offsetY}px ${element.style.textShadow.blur}px ${element.style.textShadow.color}`
+                : 'none',
+              WebkitTextStroke: element.style?.textOutline?.enabled
+                ? `${element.style.textOutline.width}px ${element.style.textOutline.color}`
+                : undefined,
+              paintOrder: element.style?.textOutline?.enabled ? 'stroke fill' : undefined,
               whiteSpace: 'pre-wrap',
               wordBreak: 'break-word',
               pointerEvents: 'none',
@@ -259,7 +264,6 @@ export const Canvas: React.FC<CanvasProps> = ({
               alt={element.iconName || 'icon'}
               className="w-full h-full object-contain pointer-events-none"
               draggable={false}
-              style={{ objectFit: 'contain' }}
             />
             {isSelected && (
               <div

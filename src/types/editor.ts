@@ -26,6 +26,20 @@ export interface TextStyle {
   textAlign: 'left' | 'center' | 'right';
   lineHeight?: number;
   letterSpacing?: number;
+  fontStyle?: 'normal' | 'italic';
+  textDecoration?: 'none' | 'underline' | 'line-through';
+  textShadow?: {
+    enabled: boolean;
+    offsetX: number;
+    offsetY: number;
+    blur: number;
+    color: string;
+  };
+  textOutline?: {
+    enabled: boolean;
+    width: number;
+    color: string;
+  };
 }
 
 export interface Slide {
@@ -430,7 +444,7 @@ export const TYPOGRAPHY = {
   },
 };
 
-export const createDefaultSlide = (canvasWidth = 1080, canvasHeight = 1350, isDark = true): Slide => {
+export const createDefaultSlide = (canvasWidth = 1080, canvasHeight = 1080, isDark = true): Slide => {
   const centerX = canvasWidth / 2;
   const contentWidth = canvasWidth - (LAYOUT.SAFE_PADDING * 2);
   const mode = isDark ? 'dark' : 'light';

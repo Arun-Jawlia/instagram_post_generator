@@ -1,11 +1,22 @@
 import React, { useState, useRef } from "react";
-import { Trash2, Upload } from "lucide-react";
+import {
+  Trash2,
+  Upload,
+  Bold,
+  Italic,
+  Underline,
+  Strikethrough,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
+import { Toggle } from "@/components/ui/toggle";
 import {
   SlideElement,
   Theme,
@@ -82,7 +93,6 @@ const elementRoles: { value: ElementRole; label: string }[] = [
   { value: "code", label: "Code" },
   { value: "custom", label: "Custom" },
 ];
-
 
 export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   selectedElement,
@@ -242,6 +252,303 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                   ))}
               </optgroup>
             </select>
+          </div>
+
+          <div className="panel-section">
+            <Label className="panel-title">Text Style</Label>
+            <div className="flex gap-1 mt-2">
+              <Toggle
+                pressed={selectedElement.style?.fontWeight === 700}
+                onPressedChange={(pressed) =>
+                  onUpdateElement(selectedElement.id, {
+                    style: {
+                      ...selectedElement.style!,
+                      fontWeight: pressed ? 700 : 400,
+                    },
+                  })
+                }
+                size="sm"
+                aria-label="Bold"
+              >
+                <Bold className="h-4 w-4" />
+              </Toggle>
+              <Toggle
+                pressed={selectedElement.style?.fontStyle === "italic"}
+                onPressedChange={(pressed) =>
+                  onUpdateElement(selectedElement.id, {
+                    style: {
+                      ...selectedElement.style!,
+                      fontStyle: pressed ? "italic" : "normal",
+                    },
+                  })
+                }
+                size="sm"
+                aria-label="Italic"
+              >
+                <Italic className="h-4 w-4" />
+              </Toggle>
+              <Toggle
+                pressed={selectedElement.style?.textDecoration === "underline"}
+                onPressedChange={(pressed) =>
+                  onUpdateElement(selectedElement.id, {
+                    style: {
+                      ...selectedElement.style!,
+                      textDecoration: pressed ? "underline" : "none",
+                    },
+                  })
+                }
+                size="sm"
+                aria-label="Underline"
+              >
+                <Underline className="h-4 w-4" />
+              </Toggle>
+              <Toggle
+                pressed={
+                  selectedElement.style?.textDecoration === "line-through"
+                }
+                onPressedChange={(pressed) =>
+                  onUpdateElement(selectedElement.id, {
+                    style: {
+                      ...selectedElement.style!,
+                      textDecoration: pressed ? "line-through" : "none",
+                    },
+                  })
+                }
+                size="sm"
+                aria-label="Strikethrough"
+              >
+                <Strikethrough className="h-4 w-4" />
+              </Toggle>
+            </div>
+          </div>
+
+          <div className="panel-section">
+            <Label className="panel-title">Text Alignment</Label>
+            <div className="flex gap-1 mt-2">
+              <Toggle
+                pressed={selectedElement.style?.textAlign === "left"}
+                onPressedChange={() =>
+                  onUpdateElement(selectedElement.id, {
+                    style: { ...selectedElement.style!, textAlign: "left" },
+                  })
+                }
+                size="sm"
+                aria-label="Align Left"
+              >
+                <AlignLeft className="h-4 w-4" />
+              </Toggle>
+              <Toggle
+                pressed={selectedElement.style?.textAlign === "center"}
+                onPressedChange={() =>
+                  onUpdateElement(selectedElement.id, {
+                    style: { ...selectedElement.style!, textAlign: "center" },
+                  })
+                }
+                size="sm"
+                aria-label="Align Center"
+              >
+                <AlignCenter className="h-4 w-4" />
+              </Toggle>
+              <Toggle
+                pressed={selectedElement.style?.textAlign === "right"}
+                onPressedChange={() =>
+                  onUpdateElement(selectedElement.id, {
+                    style: { ...selectedElement.style!, textAlign: "right" },
+                  })
+                }
+                size="sm"
+                aria-label="Align Right"
+              >
+                <AlignRight className="h-4 w-4" />
+              </Toggle>
+            </div>
+          </div>
+
+          <div className="panel-section">
+            <div className="flex items-center justify-between mb-2">
+              <Label className="panel-title mb-0">Text Shadow</Label>
+              <Switch
+                checked={selectedElement.style?.textShadow?.enabled || false}
+                onCheckedChange={(checked) =>
+                  onUpdateElement(selectedElement.id, {
+                    style: {
+                      ...selectedElement.style!,
+                      textShadow: {
+                        enabled: checked,
+                        offsetX:
+                          selectedElement.style?.textShadow?.offsetX ?? 2,
+                        offsetY:
+                          selectedElement.style?.textShadow?.offsetY ?? 2,
+                        blur: selectedElement.style?.textShadow?.blur ?? 4,
+                        color:
+                          selectedElement.style?.textShadow?.color ?? "#000000",
+                      },
+                    },
+                  })
+                }
+              />
+            </div>
+            {selectedElement.style?.textShadow?.enabled && (
+              <div className="space-y-3 mt-3">
+                <div>
+                  <Label className="text-xs text-muted-foreground">
+                    Offset X: {selectedElement.style.textShadow.offsetX}px
+                  </Label>
+                  <Slider
+                    value={[selectedElement.style.textShadow.offsetX]}
+                    onValueChange={([value]) =>
+                      onUpdateElement(selectedElement.id, {
+                        style: {
+                          ...selectedElement.style!,
+                          textShadow: {
+                            ...selectedElement.style!.textShadow!,
+                            offsetX: value,
+                          },
+                        },
+                      })
+                    }
+                    min={-20}
+                    max={20}
+                    step={1}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">
+                    Offset Y: {selectedElement.style.textShadow.offsetY}px
+                  </Label>
+                  <Slider
+                    value={[selectedElement.style.textShadow.offsetY]}
+                    onValueChange={([value]) =>
+                      onUpdateElement(selectedElement.id, {
+                        style: {
+                          ...selectedElement.style!,
+                          textShadow: {
+                            ...selectedElement.style!.textShadow!,
+                            offsetY: value,
+                          },
+                        },
+                      })
+                    }
+                    min={-20}
+                    max={20}
+                    step={1}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">
+                    Blur: {selectedElement.style.textShadow.blur}px
+                  </Label>
+                  <Slider
+                    value={[selectedElement.style.textShadow.blur]}
+                    onValueChange={([value]) =>
+                      onUpdateElement(selectedElement.id, {
+                        style: {
+                          ...selectedElement.style!,
+                          textShadow: {
+                            ...selectedElement.style!.textShadow!,
+                            blur: value,
+                          },
+                        },
+                      })
+                    }
+                    min={0}
+                    max={30}
+                    step={1}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">
+                    Shadow Color
+                  </Label>
+                  <Input
+                    type="color"
+                    value={selectedElement.style.textShadow.color}
+                    onChange={(e) =>
+                      onUpdateElement(selectedElement.id, {
+                        style: {
+                          ...selectedElement.style!,
+                          textShadow: {
+                            ...selectedElement.style!.textShadow!,
+                            color: e.target.value,
+                          },
+                        },
+                      })
+                    }
+                    className="mt-1 h-8 input-field"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="panel-section">
+            <div className="flex items-center justify-between mb-2">
+              <Label className="panel-title mb-0">Text Outline</Label>
+              <Switch
+                checked={selectedElement.style?.textOutline?.enabled || false}
+                onCheckedChange={(checked) =>
+                  onUpdateElement(selectedElement.id, {
+                    style: {
+                      ...selectedElement.style!,
+                      textOutline: {
+                        enabled: checked,
+                        width: selectedElement.style?.textOutline?.width ?? 2,
+                        color:
+                          selectedElement.style?.textOutline?.color ??
+                          "#000000",
+                      },
+                    },
+                  })
+                }
+              />
+            </div>
+            {selectedElement.style?.textOutline?.enabled && (
+              <div className="space-y-3 mt-3">
+                <div>
+                  <Label className="text-xs text-muted-foreground">
+                    Width: {selectedElement.style.textOutline.width}px
+                  </Label>
+                  <Slider
+                    value={[selectedElement.style.textOutline.width]}
+                    onValueChange={([value]) =>
+                      onUpdateElement(selectedElement.id, {
+                        style: {
+                          ...selectedElement.style!,
+                          textOutline: {
+                            ...selectedElement.style!.textOutline!,
+                            width: value,
+                          },
+                        },
+                      })
+                    }
+                    min={1}
+                    max={10}
+                    step={1}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">
+                    Outline Color
+                  </Label>
+                  <Input
+                    type="color"
+                    value={selectedElement.style.textOutline.color}
+                    onChange={(e) =>
+                      onUpdateElement(selectedElement.id, {
+                        style: {
+                          ...selectedElement.style!,
+                          textOutline: {
+                            ...selectedElement.style!.textOutline!,
+                            color: e.target.value,
+                          },
+                        },
+                      })
+                    }
+                    className="mt-1 h-8 input-field"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="panel-section">
@@ -452,33 +759,29 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
     return null;
   };
+
   const renderThemeProperties = () => (
     <div className="space-y-4">
       <div className="panel-section">
         <Label className="panel-title">Canvas Size</Label>
         <div className="grid grid-cols-1 gap-2">
-          {canvasSizePresets.map(
-            (preset) => (
-              console.log(canvasSize, preset),
-              (
-                <button
-                  key={preset.name}
-                  className={`canvas-size-button text-left ${
-                    canvasSize.width === preset.width &&
-                    canvasSize.height === preset.height
-                      ? "canvas-size-button-active"
-                      : ""
-                  }`}
-                  onClick={() => onSetCanvasSize(preset)}
-                >
-                  <span className="block font-medium">{preset.name}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {preset.width}×{preset.height}
-                  </span>
-                </button>
-              )
-            ),
-          )}
+          {canvasSizePresets.map((preset) => (
+            <button
+              key={preset.name}
+              className={`canvas-size-button text-left ${
+                canvasSize.width === preset.width &&
+                canvasSize.height === preset.height
+                  ? "canvas-size-button-active"
+                  : ""
+              }`}
+              onClick={() => onSetCanvasSize(preset)}
+            >
+              <span className="block font-medium">{preset.name}</span>
+              <span className="text-xs text-muted-foreground">
+                {preset.width}×{preset.height}
+              </span>
+            </button>
+          ))}
         </div>
       </div>
 

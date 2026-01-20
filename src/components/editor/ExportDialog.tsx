@@ -65,8 +65,13 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
     for (const element of slide.elements) {
       if (element.type === "text" && element.content) {
         ctx.save();
-        ctx.fillStyle = element.style?.color || "#ffffff";
-        ctx.font = `${element.style?.fontWeight || 400} ${element.style?.fontSize || 16}px ${element.style?.fontFamily || "Inter"}`;
+
+        const fontStyle =
+          element.style?.fontStyle === "italic" ? "italic " : "";
+        const fontWeight = element.style?.fontWeight || 400;
+        const fontSize = element.style?.fontSize || 16;
+        const fontFamily = element.style?.fontFamily || "Inter";
+        ctx.font = `${fontStyle}${fontWeight} ${fontSize}px ${fontFamily}`;
         ctx.textAlign = element.style?.textAlign || "left";
         ctx.textBaseline = "middle";
 
@@ -83,8 +88,65 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
         const totalHeight = lines.length * lineHeight;
         const startY = element.y - totalHeight / 2 + lineHeight / 2;
 
+        // Apply text shadow
+        if (element.style?.textShadow?.enabled) {
+          ctx.shadowOffsetX = element.style.textShadow.offsetX;
+          ctx.shadowOffsetY = element.style.textShadow.offsetY;
+          ctx.shadowBlur = element.style.textShadow.blur;
+          ctx.shadowColor = element.style.textShadow.color;
+        }
+
         lines.forEach((line, index) => {
-          ctx.fillText(line, x, startY + index * lineHeight);
+          const textY = startY + index * lineHeight;
+
+          // Draw outline first (behind fill)
+          if (element.style?.textOutline?.enabled) {
+            ctx.strokeStyle = element.style.textOutline.color;
+            ctx.lineWidth = element.style.textOutline.width * 2;
+            ctx.lineJoin = "round";
+            ctx.miterLimit = 2;
+            ctx.strokeText(line, x, textY);
+          }
+
+          // Draw fill text
+          ctx.fillStyle = element.style?.color || "#ffffff";
+          ctx.fillText(line, x, textY);
+
+          // Reset shadow for decorations
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 0;
+          ctx.shadowBlur = 0;
+          ctx.shadowColor = "transparent";
+
+          // Handle text decoration (underline/strikethrough)
+          if (
+            element.style?.textDecoration &&
+            element.style.textDecoration !== "none"
+          ) {
+            const metrics = ctx.measureText(line);
+            const textWidth = metrics.width;
+
+            let lineX = x;
+            if (element.style?.textAlign === "center") {
+              lineX = x - textWidth / 2;
+            } else if (element.style?.textAlign === "right") {
+              lineX = x - textWidth;
+            }
+
+            ctx.beginPath();
+            ctx.strokeStyle = element.style?.color || "#ffffff";
+            ctx.lineWidth = Math.max(1, fontSize / 16);
+
+            if (element.style.textDecoration === "underline") {
+              const underlineY = textY + fontSize * 0.15;
+              ctx.moveTo(lineX, underlineY);
+              ctx.lineTo(lineX + textWidth, underlineY);
+            } else if (element.style.textDecoration === "line-through") {
+              ctx.moveTo(lineX, textY);
+              ctx.lineTo(lineX + textWidth, textY);
+            }
+            ctx.stroke();
+          }
         });
 
         ctx.restore();
@@ -105,21 +167,21 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
         });
       }
 
-     // Draw icons
-      if (element.type === 'icon') {
+      // Draw icons
+      if (element.type === "icon") {
         // Colorful icon from CDN - preserve aspect ratio
         if (element.iconUrl) {
           await new Promise<void>((resolve) => {
             const img = new window.Image();
-            img.crossOrigin = 'anonymous';
+            img.crossOrigin = "anonymous";
             img.onload = () => {
               // Calculate aspect ratio to prevent stretching
               const imgAspect = img.naturalWidth / img.naturalHeight;
               const elemAspect = element.width / element.height;
-              
+
               let drawWidth = element.width;
               let drawHeight = element.height;
-              
+
               if (imgAspect > elemAspect) {
                 // Image is wider - fit to width
                 drawHeight = element.width / imgAspect;
@@ -127,11 +189,11 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
                 // Image is taller - fit to height
                 drawWidth = element.height * imgAspect;
               }
-              
+
               // Center the image within the element bounds
               const x = element.x - drawWidth / 2;
               const y = element.y - drawHeight / 2;
-              
+
               ctx.drawImage(img, x, y, drawWidth, drawHeight);
               resolve();
             };
@@ -141,14 +203,16 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
         } else if (element.iconName) {
           // Lucide icon - render as SVG
           await new Promise<void>((resolve) => {
-            const iconColor = element.iconColor || '#ffffff';
+            const iconColor = element.iconColor || "#ffffff";
             const size = Math.min(element.width, element.height);
-            
+
             // Create SVG string for the icon
             const svgString = getIconSvg(element.iconName!, iconColor, size);
-            const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+            const svgBlob = new Blob([svgString], {
+              type: "image/svg+xml;charset=utf-8",
+            });
             const url = URL.createObjectURL(svgBlob);
-            
+
             const img = new window.Image();
             img.onload = () => {
               // Center the icon

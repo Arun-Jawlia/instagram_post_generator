@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Download, Image, FolderArchive, Check } from "lucide-react";
+import { Image, FolderArchive, Check } from "lucide-react";
 import { Slide } from "@/types/editor";
 import { getIconSvg } from "@/lib/iconPaths";
 
@@ -105,18 +105,34 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
         });
       }
 
-      // Draw icons
-      if (element.type === "icon") {
-        const x = element.x - element.width / 2;
-        const y = element.y - element.height / 2;
-
-        // Colorful icon from CDN
+     // Draw icons
+      if (element.type === 'icon') {
+        // Colorful icon from CDN - preserve aspect ratio
         if (element.iconUrl) {
           await new Promise<void>((resolve) => {
             const img = new window.Image();
-            img.crossOrigin = "anonymous";
+            img.crossOrigin = 'anonymous';
             img.onload = () => {
-              ctx.drawImage(img, x, y, element.width, element.height);
+              // Calculate aspect ratio to prevent stretching
+              const imgAspect = img.naturalWidth / img.naturalHeight;
+              const elemAspect = element.width / element.height;
+              
+              let drawWidth = element.width;
+              let drawHeight = element.height;
+              
+              if (imgAspect > elemAspect) {
+                // Image is wider - fit to width
+                drawHeight = element.width / imgAspect;
+              } else {
+                // Image is taller - fit to height
+                drawWidth = element.height * imgAspect;
+              }
+              
+              // Center the image within the element bounds
+              const x = element.x - drawWidth / 2;
+              const y = element.y - drawHeight / 2;
+              
+              ctx.drawImage(img, x, y, drawWidth, drawHeight);
               resolve();
             };
             img.onerror = () => resolve();
@@ -125,19 +141,20 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
         } else if (element.iconName) {
           // Lucide icon - render as SVG
           await new Promise<void>((resolve) => {
-            const iconColor = element.iconColor || "#ffffff";
+            const iconColor = element.iconColor || '#ffffff';
             const size = Math.min(element.width, element.height);
-
+            
             // Create SVG string for the icon
             const svgString = getIconSvg(element.iconName!, iconColor, size);
-            const svgBlob = new Blob([svgString], {
-              type: "image/svg+xml;charset=utf-8",
-            });
+            const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
             const url = URL.createObjectURL(svgBlob);
-
+            
             const img = new window.Image();
             img.onload = () => {
-              ctx.drawImage(img, x, y, element.width, element.height);
+              // Center the icon
+              const x = element.x - size / 2;
+              const y = element.y - size / 2;
+              ctx.drawImage(img, x, y, size, size);
               URL.revokeObjectURL(url);
               resolve();
             };
@@ -153,7 +170,6 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
 
     return canvas;
   };
-
   const exportSingleImage = async (slideIndex: number) => {
     const slide = slides[slideIndex];
     const canvas = await renderSlideToCanvas(slide);

@@ -83,6 +83,16 @@ const elementRoles: { value: ElementRole; label: string }[] = [
   { value: "custom", label: "Custom" },
 ];
 
+const elementRoles: { value: ElementRole; label: string }[] = [
+  { value: 'title', label: 'Title' },
+  { value: 'subtitle', label: 'Subtitle' },
+  { value: 'body', label: 'Body Text' },
+  { value: 'username', label: 'Username' },
+  { value: 'footer', label: 'Footer' },
+  { value: 'code', label: 'Code' },
+  { value: 'custom', label: 'Custom' },
+];
+
 export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   selectedElement,
   theme,
